@@ -83,7 +83,8 @@ public class BoardGenerator : MonoBehaviour
 
     void GetResources()
     {
-        var names = GetFolderNames("Assets/Resources/Board").ToList();
+        var path = "Board/Dungeon";
+        var names = GetFolderNames("Assets/Resources/" + path).ToList();
         _filedsByType = new Dictionary<BoardField, List<GameObject>>();
 
         foreach (var name in names)
@@ -92,7 +93,7 @@ public class BoardGenerator : MonoBehaviour
 
             if (Enum.TryParse(name, out fieldType))
             {
-                var fields = Resources.LoadAll<GameObject>("Board/" + name).ToList();
+                var fields = Resources.LoadAll<GameObject>(path + "/" + name).ToList();
                 _filedsByType.Add(fieldType, fields);
             }
         }
@@ -358,7 +359,8 @@ public class BoardGenerator : MonoBehaviour
                 if (_filedsByType.TryGetValue(_board[x, y], out fields))
                 {
                     var position = new Vector2(x, y);
-                    var field = fields[Random.Range(0, fields.Count)];
+                    var index = Random.Range(0, fields.Count);
+                    var field = fields[index];
                     var instance = Instantiate(field, position, Quaternion.identity) as GameObject;
                     instance.transform.SetParent(boardHolder);
                 }
