@@ -11,7 +11,8 @@ public class BoardGenerator : MonoBehaviour
     int _minimumFloorTiles;
     int _maximumFloorTiles;
     FiledStatus[,] _obstacles;
-    BoardField[,] _board;  
+    BoardField[,] _board;
+    DictionaryInfoHelper _dictionaryInfoHelper;
     List<Vector2> _outerFloorTilesPostitions;
     List<Vector2> _innerFloorTilesPostitions;
     Dictionary<BoardField, List<GameObject>> _filedsByType;
@@ -33,6 +34,13 @@ public class BoardGenerator : MonoBehaviour
 
     private void Awake()
     {
+        Initialize();
+        GetResources();
+        SetupScene();
+    }
+
+    private void Initialize()
+    {
         var usableSpace = (BoardHeight - 2 * BorderSize) * (BoardWidth - 2 * BorderSize);
 
         Board = new BoardInfo()
@@ -40,8 +48,10 @@ public class BoardGenerator : MonoBehaviour
             BoardFields = new BoardField[BoardWidth, BoardHeight],
             BoardObstacles = new FiledStatus[BoardWidth, BoardHeight]
         };
+
         _board = Board.BoardFields;
         _obstacles = Board.BoardObstacles;
+        _dictionaryInfoHelper = new DictionaryInfoHelper();
         _outerFloorTilesPostitions = new List<Vector2>();
         _innerFloorTilesPostitions = new List<Vector2>();
         _minimumFloorTiles = usableSpace * MinimumAvailableSurfacePercent / 100;
@@ -68,23 +78,12 @@ public class BoardGenerator : MonoBehaviour
             // 4
             { "1111", BoardField.FullWall }
         };
-
-        GetResources();
-        SetupScene();
-    }
-
-    private IEnumerable<string> GetFolderNames(string path)
-    {
-        DirectoryInfo dir = new DirectoryInfo(path);
-        DirectoryInfo[] info = dir.GetDirectories();
-
-        return info.Select(i => i.Name);
     }
 
     private void GetResources()
     {
         var path = "Board/Dungeon";
-        var names = GetFolderNames("Assets/Resources/" + path).ToList();
+        var names = _dictionaryInfoHelper.GetFolderNames("Assets/Resources/" + path);
         _filedsByType = new Dictionary<BoardField, List<GameObject>>();
 
         foreach (var name in names)

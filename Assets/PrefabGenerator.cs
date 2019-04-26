@@ -9,10 +9,11 @@ public class PrefabGenerator : MonoBehaviour
     [MenuItem("Generate/Prefabs")]
     public static void GeneratePrefabs()
     {
+        var dictionaryInfoHelper = new DictionaryInfoHelper();
         var spritesFolderPath = "Assets/Resources/Board/Dungeon"; // TODO
         var prefabsFolderPath = "Assets/Resources/Test/"; // TODO
 
-        var foldersNames = GetFolderNames(spritesFolderPath);
+        var foldersNames = dictionaryInfoHelper.GetFolderNames(spritesFolderPath);
         foreach (var folderName in foldersNames)
         {
             var spritesPath = spritesFolderPath + folderName;
@@ -28,26 +29,11 @@ public class PrefabGenerator : MonoBehaviour
         }
     }
 
-    private static IList<string> GetFolderNames(string path)
-    {
-        var dir = new DirectoryInfo(path);
-        var info = dir.GetDirectories();
-
-        return info.Select(i => i.Name).ToList();
-    }
-
-    private static IList<string> GetFilesNames(string path)
-    {
-        var dir = new DirectoryInfo(path);
-        var info = dir.GetFiles();
-
-        return info.Select(i => i.Name).ToList();
-    }
-
     private static List<Sprite> LoadSprites(string path)
     {
+        var dictionaryInfoHelper = new DictionaryInfoHelper();
         var sprites = new List<Sprite>();
-        var spritesNames = GetFilesNames(path);
+        var spritesNames = dictionaryInfoHelper.GetFilesNames(path);
         
         foreach (var spriteName in spritesNames)
         {
