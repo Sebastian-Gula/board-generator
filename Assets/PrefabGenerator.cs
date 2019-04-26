@@ -10,10 +10,10 @@ public class PrefabGenerator : MonoBehaviour
     public static void GeneratePrefabs()
     {
         var dictionaryInfoHelper = new DictionaryInfoHelper();
-        var spritesFolderPath = "Assets/Resources/Board/Dungeon"; // TODO
-        var prefabsFolderPath = "Assets/Resources/Test/"; // TODO
-
+        var spritesFolderPath = "Assets/Entities/BoardGenerators/Dungeon/Sprites/";
+        var prefabsFolderPath = "Assets/Resources/Board/Dungeon/";
         var foldersNames = dictionaryInfoHelper.GetFolderNames(spritesFolderPath);
+
         foreach (var folderName in foldersNames)
         {
             var spritesPath = spritesFolderPath + folderName;
@@ -33,11 +33,13 @@ public class PrefabGenerator : MonoBehaviour
     {
         var dictionaryInfoHelper = new DictionaryInfoHelper();
         var sprites = new List<Sprite>();
-        var spritesNames = dictionaryInfoHelper.GetFilesNames(path);
+        var spritesNames = dictionaryInfoHelper
+            .GetFilesNames(path)
+            .Where(name => name.EndsWith(".png")).ToList();
         
         foreach (var spriteName in spritesNames)
         {
-            sprites.Add(AssetDatabase.LoadAssetAtPath<Sprite>(path + spriteName));
+            sprites.Add(AssetDatabase.LoadAssetAtPath<Sprite>(path + "/" + spriteName));
         }
 
         return sprites;
