@@ -128,7 +128,11 @@ public class BoardGenerator : MonoBehaviour
     Room FindBiggestRoom()
     {
         int roomNumber = 3;
-        Room bigestRoom = new Room(0, 0);
+        var bigestRoom = new Room
+        {
+            RoomNumber = 0,
+            Size = 0
+        };
 
         for (int x = 0; x < BoardWidth; x++)
         {
@@ -140,7 +144,8 @@ public class BoardGenerator : MonoBehaviour
                 {
                     if (_size > bigestRoom.Size)
                     {
-                        bigestRoom = new Room(roomNumber, _size);
+                        bigestRoom.RoomNumber = roomNumber;
+                        bigestRoom.Size = _size;
                     }
 
                     _size = 0;
