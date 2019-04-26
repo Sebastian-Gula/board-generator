@@ -3,8 +3,8 @@
 [System.Serializable]
 public class Size
 {
-    public int Min { get; set; }
-    public int Max { get; set; }
+    public int Min;
+    public int Max;
 
     public int GetRandomSize()
     {
