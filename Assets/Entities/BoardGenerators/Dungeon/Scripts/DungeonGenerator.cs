@@ -10,8 +10,6 @@
     {
         ClearBoard(width, height);
 
-        var x = 0;
-        var y = 0;
         var column = 0;
         var row = 0;
         var sumY = 0;
@@ -44,14 +42,14 @@
                 continue;
             }
 
-            for (x = beginningOfX; x < endOfX; x++)
+            for (var x = beginningOfX; x < endOfX; x++)
             {
-                for (y = beginningOfY; y < endOfY; y++)
+                for (var y = beginningOfY; y < endOfY; y++)
                 {
                     board[x, y] = BoardField.Empty;
                 }
             }
-                                
+
             translationX = endOfX + SpaceX.GetRandomSize();         
             column++;
         }
