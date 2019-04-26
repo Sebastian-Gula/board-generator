@@ -4,7 +4,7 @@ using System.Linq;
 
 public class DictionaryInfoHelper
 {
-    private static IList<string> GetFolderNames(string path)
+    public IList<string> GetFolderNames(string path)
     {
         var dir = new DirectoryInfo(path);
         var info = dir.GetDirectories();
@@ -12,7 +12,7 @@ public class DictionaryInfoHelper
         return info.Select(i => i.Name).ToList();
     }
 
-    private static IList<string> GetFilesNames(string path)
+    public IList<string> GetFilesNames(string path)
     {
         var dir = new DirectoryInfo(path);
         var info = dir.GetFiles();
