@@ -1,4 +1,4 @@
-﻿public class MyBoardGenerator : BoardGeneratorStrategy
+﻿public class DungeonGenerator : BoardGeneratorStrategy
 {
     public Size RoomXSize;
     public Size RoomYSize;
