@@ -31,7 +31,7 @@ public class BoardGenerator : MonoBehaviour
     public int MaximumAvailableSurfacePercent;
 
 
-    void Awake()
+    private void Awake()
     {
         var usableSpace = (BoardHeight - 2 * BorderSize) * (BoardWidth - 2 * BorderSize);
 
@@ -73,7 +73,7 @@ public class BoardGenerator : MonoBehaviour
         SetupScene();
     }
 
-    IEnumerable<string> GetFolderNames(string path)
+    private IEnumerable<string> GetFolderNames(string path)
     {
         DirectoryInfo dir = new DirectoryInfo(path);
         DirectoryInfo[] info = dir.GetDirectories();
@@ -81,7 +81,7 @@ public class BoardGenerator : MonoBehaviour
         return info.Select(i => i.Name);
     }
 
-    void GetResources()
+    private void GetResources()
     {
         var path = "Board/Dungeon";
         var names = GetFolderNames("Assets/Resources/" + path).ToList();
@@ -99,12 +99,12 @@ public class BoardGenerator : MonoBehaviour
         }
     }
 
-    void GenerateBoard()
+    private void GenerateBoard()
     {
         Board.BoardFields = _board = BoardGeneratorStrategy.GenerateBoard(BoardWidth, BoardHeight, BorderSize);
     }
 
-    void ImproveBoard()
+    private void ImproveBoard()
     {
         Room bigestRoom = FindBiggestRoom();
 
@@ -125,7 +125,7 @@ public class BoardGenerator : MonoBehaviour
         RemoveClutter();
     }
 
-    Room FindBiggestRoom()
+    private Room FindBiggestRoom()
     {
         int roomNumber = 3;
         var bigestRoom = new Room
@@ -157,7 +157,7 @@ public class BoardGenerator : MonoBehaviour
         return bigestRoom;
     }
 
-    void ConnectRooms()
+    private void ConnectRooms()
     {
         for (int x = 0; x < BoardWidth; x++)
         {
@@ -185,7 +185,7 @@ public class BoardGenerator : MonoBehaviour
         ImproveBoard();
     }
 
-    void DisconnectRooms()
+    private void DisconnectRooms()
     {
         RemoveRooms();
 
@@ -214,7 +214,7 @@ public class BoardGenerator : MonoBehaviour
         ImproveBoard();
     }
 
-    void RemoveRooms()
+    private void RemoveRooms()
     {
         for (int x = 0; x < BoardWidth; x++)
         {
@@ -228,7 +228,7 @@ public class BoardGenerator : MonoBehaviour
         }
     }
 
-    void RoomSize(int x, int y, int roomNumber)
+    private void RoomSize(int x, int y, int roomNumber)
     {
         if (_board[x, y] == BoardField.Empty)
         {
@@ -242,7 +242,7 @@ public class BoardGenerator : MonoBehaviour
         }
     }
 
-    void ClearOtherRooms(int roomNumber)
+    private void ClearOtherRooms(int roomNumber)
     {
         for (int x = 0; x < BoardWidth; x++)
         {
@@ -265,7 +265,7 @@ public class BoardGenerator : MonoBehaviour
         }
     }
 
-    void FindWalls()
+    private void FindWalls()
     {
         for (int x = 1; x < BoardWidth - 1; x++)
         {
@@ -290,7 +290,7 @@ public class BoardGenerator : MonoBehaviour
         }
     }
 
-    void RemoveClutter()
+    private void RemoveClutter()
     {
         for (int x = 0; x < BoardWidth; x++)
         {
@@ -307,7 +307,7 @@ public class BoardGenerator : MonoBehaviour
         }
     }
 
-    void FindInnerOuterFloors()
+    private void FindInnerOuterFloors()
     {
         for (int x = 1; x < BoardWidth - 1; x++)
         {
@@ -332,8 +332,8 @@ public class BoardGenerator : MonoBehaviour
             }
         }
     }
-  
-    void FindObstacles()
+
+    private void FindObstacles()
     {
         for (int x = 0; x < BoardWidth; x++)
         {
@@ -351,7 +351,7 @@ public class BoardGenerator : MonoBehaviour
         }
     }
  
-    void DrawBoard()
+    private void DrawBoard()
     {
         Transform boardHolder = new GameObject("Board").transform;
 
