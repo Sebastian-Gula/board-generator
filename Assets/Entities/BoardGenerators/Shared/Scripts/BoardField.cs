@@ -21,7 +21,7 @@
     TopRightBottomWall,
     TopRightLeftWall,
     TopBottomLeftWall,
-    RightBottomLeftWall, 
+    RightBottomLeftWall,
 
     FullWall
 };

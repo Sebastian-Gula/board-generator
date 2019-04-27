@@ -31,7 +31,7 @@
             {
                 break;
             }
-                
+
             if (endOfX > width - borderSize - StartSize.GetRandomSize())
             {
                 translationX = borderSize;
@@ -50,7 +50,7 @@
                 }
             }
 
-            translationX = endOfX + SpaceX.GetRandomSize();         
+            translationX = endOfX + SpaceX.GetRandomSize();
             column++;
         }
 

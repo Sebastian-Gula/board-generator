@@ -80,7 +80,7 @@ public class BoardGenerator : MonoBehaviour
     {
         var path = "Board/Dungeon";
         var names = _dictionaryInfoHelper.GetFolderNames("Assets/Resources/" + path);
-        
+
         foreach (var name in names)
         {
             var fieldType = BoardField.Empty;
@@ -95,7 +95,7 @@ public class BoardGenerator : MonoBehaviour
 
     private void GenerateBoard()
     {
-        Board.BoardFields = Board.BoardFields = BoardGeneratorStrategy.GenerateBoard(BoardWidth, BoardHeight, BorderSize);
+        Board.BoardFields = BoardGeneratorStrategy.GenerateBoard(BoardWidth, BoardHeight, BorderSize);
     }
 
     private void ImproveBoard()
@@ -157,20 +157,18 @@ public class BoardGenerator : MonoBehaviour
         {
             for (int y = 0; y < BoardHeight; y++)
             {
-                if (x < BorderSize || 
-                    x > BoardWidth - BorderSize ||
-                    y < BorderSize || 
-                    y > BoardHeight - BorderSize)
+                if (x < BorderSize
+                    || x > BoardWidth - BorderSize
+                    || y < BorderSize
+                    || y > BoardHeight - BorderSize)
                 {
                     continue;
                 }
 
-                if (Board.BoardFields[x, y] == BoardField.Wall)
+                if (Board.BoardFields[x, y] == BoardField.Wall
+                    && Random.Range(0, 25) == 1)
                 {
-                    if (Random.Range(0, 25) == 1)
-                    {
-                        Board.BoardFields[x, y] = BoardField.Empty;
-                    }
+                    Board.BoardFields[x, y] = BoardField.Empty;
                 }
             }
         }
@@ -187,24 +185,22 @@ public class BoardGenerator : MonoBehaviour
         {
             for (int y = 0; y < BoardHeight; y++)
             {
-                if (x < BorderSize ||
-                    x > BoardWidth - BorderSize ||
-                    y < BorderSize ||
-                    y > BoardHeight - BorderSize)
+                if (x < BorderSize
+                    || x > BoardWidth - BorderSize
+                    || y < BorderSize
+                    || y > BoardHeight - BorderSize)
                 {
                     continue;
                 }
 
-                if (Board.BoardFields[x, y] == BoardField.Empty)
+                if (Board.BoardFields[x, y] == BoardField.Empty
+                    && Random.Range(0, 30) == 1)
                 {
-                    if (Random.Range(0, 30) == 1)
-                    {
-                        Board.BoardFields[x, y] = BoardField.Wall;
-                    }
+                    Board.BoardFields[x, y] = BoardField.Wall;
                 }
             }
         }
-   
+
         ImproveBoard();
     }
 
@@ -242,11 +238,6 @@ public class BoardGenerator : MonoBehaviour
         {
             for (int y = 0; y < BoardHeight; y++)
             {
-                if (Board.BoardFields[x, y] == BoardField.Wall)
-                {
-                    continue;
-                }
-
                 if (Board.BoardFields[x, y] == (BoardField)roomNumber)
                 {
                     Board.BoardFields[x, y] = BoardField.Floor;
@@ -274,9 +265,8 @@ public class BoardGenerator : MonoBehaviour
                           ((Board.BoardFields[x + 1, y] == BoardField.Floor) ? "1" : "0") +
                           ((Board.BoardFields[x, y - 1] == BoardField.Floor) ? "1" : "0") +
                           ((Board.BoardFields[x - 1, y] == BoardField.Floor) ? "1" : "0");
-                var type = BoardField.Empty;
 
-                if (_fieldTypeByNeigbors.TryGetValue(key, out type))
+                if (_fieldTypeByNeigbors.TryGetValue(key, out BoardField type))
                 {
                     Board.BoardFields[x, y] = type;
                 }
@@ -290,12 +280,10 @@ public class BoardGenerator : MonoBehaviour
         {
             for (int y = 0; y < BoardHeight; y++)
             {
-                if (Board.BoardFields[x, y] == BoardField.FullWall)
+                if (Board.BoardFields[x, y] == BoardField.FullWall
+                    && Random.Range(0, 2) == 1)
                 {
-                    if (Random.Range(0, 2) == 1)
-                    {
-                        Board.BoardFields[x, y] = BoardField.Floor;
-                    }
+                    Board.BoardFields[x, y] = BoardField.Floor;
                 }
             }
         }
@@ -312,10 +300,10 @@ public class BoardGenerator : MonoBehaviour
                     continue;
                 }
 
-                if (Board.BoardFields[x - 1, y] == BoardField.Wall ||
-                    Board.BoardFields[x, y + 1] == BoardField.Wall ||
-                    Board.BoardFields[x + 1, y] == BoardField.Wall ||
-                    Board.BoardFields[x, y - 1] == BoardField.Wall)
+                if (Board.BoardFields[x - 1, y] == BoardField.Wall
+                    || Board.BoardFields[x, y + 1] == BoardField.Wall
+                    || Board.BoardFields[x + 1, y] == BoardField.Wall
+                    || Board.BoardFields[x, y - 1] == BoardField.Wall)
                 {
                     _outerFloorTilesPostitions.Add(new Vector2(x, y));
                 }
@@ -344,7 +332,7 @@ public class BoardGenerator : MonoBehaviour
             }
         }
     }
- 
+
     private void DrawBoard()
     {
         Transform boardHolder = new GameObject("Board").transform;
@@ -353,14 +341,12 @@ public class BoardGenerator : MonoBehaviour
         {
             for (int y = 0; y < BoardHeight; y++)
             {
-                List<GameObject> fields = null;
-
-                if (_filedsByType.TryGetValue(Board.BoardFields[x, y], out fields))
+                if (_filedsByType.TryGetValue(Board.BoardFields[x, y], out List<GameObject> fields))
                 {
                     var position = new Vector2(x, y);
                     var index = Random.Range(0, fields.Count);
                     var field = fields[index];
-                    var instance = Instantiate(field, position, Quaternion.identity) as GameObject;
+                    var instance = Instantiate(field, position, Quaternion.identity);
                     instance.transform.SetParent(boardHolder);
                 }
             }
