@@ -6,7 +6,6 @@ using Random = UnityEngine.Random;
 
 public class BoardGenerator : MonoBehaviour
 {
-    private int _size = 0;
     private int _minimumFloorTiles;
     private int _maximumFloorTiles;
     private DictionaryInfoHelper _dictionaryInfoHelper;
@@ -128,21 +127,20 @@ public class BoardGenerator : MonoBehaviour
             Size = 0
         };
 
-        for (int x = 0; x < BoardWidth; x++)
+        for (var x = 0; x < BoardWidth; x++)
         {
-            for (int y = 0; y < BoardHeight; y++)
+            for (var y = 0; y < BoardHeight; y++)
             {
-                RoomSize(x, y, roomNumber);
+                var size = RoomSize(x, y, roomNumber, 0);
 
-                if (_size != 0)
+                if (size != 0)
                 {
-                    if (_size > bigestRoom.Size)
+                    if (size > bigestRoom.Size)
                     {
                         bigestRoom.RoomNumber = roomNumber;
-                        bigestRoom.Size = _size;
+                        bigestRoom.Size = size;
                     }
 
-                    _size = 0;
                     roomNumber++;
                 }
             }
@@ -218,18 +216,20 @@ public class BoardGenerator : MonoBehaviour
         }
     }
 
-    private void RoomSize(int x, int y, int roomNumber)
+    private int RoomSize(int x, int y, int roomNumber, int size)
     {
         if (Board.BoardFields[x, y] == BoardField.Empty)
         {
-            _size++;
+            size++;
             Board.BoardFields[x, y] = (BoardField)roomNumber;
 
-            RoomSize(x - 1, y, roomNumber);
-            RoomSize(x, y + 1, roomNumber);
-            RoomSize(x + 1, y, roomNumber);
-            RoomSize(x, y - 1, roomNumber);
+            size = RoomSize(x - 1, y, roomNumber, size);
+            size = RoomSize(x, y + 1, roomNumber, size);
+            size = RoomSize(x + 1, y, roomNumber, size);
+            size = RoomSize(x, y - 1, roomNumber, size);
         }
+
+        return size;
     }
 
     private void ClearOtherRooms(int roomNumber)
