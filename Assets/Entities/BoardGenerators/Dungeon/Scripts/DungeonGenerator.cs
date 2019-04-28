@@ -2,7 +2,7 @@
 {
     public Size RoomXSize;
     public Size RoomYSize;
-    public Size StartSize;
+    public Size DistanceFromBorder;
     public Size SpaceX;
     public Size SpaceY;
 
@@ -20,19 +20,19 @@
         {
             var roomXSize = RoomXSize.GetRandomSize();
             var roomYSize = RoomYSize.GetRandomSize();
-            var beginningOfX = translationX + StartSize.GetRandomSize();
+            var beginningOfX = translationX + DistanceFromBorder.GetRandomSize();
             var endOfX = beginningOfX + roomXSize;
-            var beginningOfY = translationY + StartSize.GetRandomSize();
+            var beginningOfY = translationY + DistanceFromBorder.GetRandomSize();
             var endOfY = beginningOfY + roomYSize;
 
             sumY += roomYSize;
 
-            if (endOfY > height - borderSize - StartSize.GetRandomSize())
+            if (endOfY > height - borderSize - DistanceFromBorder.GetRandomSize())
             {
                 break;
             }
 
-            if (endOfX > width - borderSize - StartSize.GetRandomSize())
+            if (endOfX > width - borderSize - DistanceFromBorder.GetRandomSize())
             {
                 translationX = borderSize;
                 translationY += (sumY / column) + SpaceY.GetRandomSize();
