@@ -6,8 +6,6 @@ using Random = UnityEngine.Random;
 
 public class BoardGenerator : MonoBehaviour
 {
-    private int _minimumFloorTiles;
-    private int _maximumFloorTiles;
     private DictionaryInfoHelper _dictionaryInfoHelper;
     private List<Vector2> _outerFloorTilesPostitions;
     private List<Vector2> _innerFloorTilesPostitions;
@@ -36,8 +34,6 @@ public class BoardGenerator : MonoBehaviour
 
     private void Initialize()
     {
-        var usableSpace = (BoardHeight - 2 * BorderSize) * (BoardWidth - 2 * BorderSize);
-
         Board = new BoardInfo()
         {
             BoardFields = new BoardField[BoardWidth, BoardHeight],
@@ -47,8 +43,7 @@ public class BoardGenerator : MonoBehaviour
         _dictionaryInfoHelper = new DictionaryInfoHelper();
         _outerFloorTilesPostitions = new List<Vector2>();
         _innerFloorTilesPostitions = new List<Vector2>();
-        _minimumFloorTiles = usableSpace * MinimumAvailableSurfacePercent / 100;
-        _maximumFloorTiles = usableSpace * MaximumAvailableSurfacePercent / 100;
+
         _filedsByType = new Dictionary<BoardField, List<GameObject>>();
         _fieldTypeByNeigbors = new Dictionary<string, BoardField>
         {
@@ -93,7 +88,8 @@ public class BoardGenerator : MonoBehaviour
 
     private void GenerateBoard()
     {
-        Board.BoardFields = BoardGeneratorStrategy.GenerateBoard(BoardWidth, BoardHeight, BorderSize);
+        Board.BoardFields
+            = BoardGeneratorStrategy.GenerateBoard(BoardWidth, BoardHeight, BorderSize, MinimumAvailableSurfacePercent, MaximumAvailableSurfacePercent);
     }
 
     private void FindWalls()
