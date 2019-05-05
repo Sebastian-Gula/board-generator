@@ -8,6 +8,6 @@ public class Range
 
     public int GetRandomRange()
     {
-        return Random.Range(Min, Max);
+        return Random.Range(Min, Max + 1);
     }
 }
