@@ -5,10 +5,9 @@ public abstract class BoardGeneratorStrategy : MonoBehaviour
     protected BoardField[,] board;
     protected int minimumFloorTiles;
     protected int maximumFloorTiles;
-
-    private int _boardWidth;
-    private int _boardHeight;
-    private int _borderSize;
+    protected int boardWidth;
+    protected int boardHeight;
+    protected int borderSize;
 
 
     public abstract BoardField[,] GenerateBoard(int width, int height, int borderSize, int minimumAvailableSurfacePercent, int maximumAvailableSurfacePercent);
@@ -18,9 +17,9 @@ public abstract class BoardGeneratorStrategy : MonoBehaviour
     {
         var usableSpace = (height - (2 * borderSize)) * (width - (2 * borderSize));
 
-        _boardWidth = width;
-        _boardHeight = height;
-        _borderSize = borderSize;
+        boardWidth = width;
+        boardHeight = height;
+        this.borderSize = borderSize;
         minimumFloorTiles = usableSpace * minimumAvailableSurfacePercent / 100;
         maximumFloorTiles = usableSpace * maximumAvailableSurfacePercent / 100;
 
@@ -54,47 +53,16 @@ public abstract class BoardGeneratorStrategy : MonoBehaviour
         return size;
     }
 
-    protected Room FindBiggestRoom()
-    {
-        int roomNumber = 3;
-        var bigestRoom = new Room
-        {
-            RoomNumber = 0,
-            Size = 0
-        };
-
-        for (var x = 0; x < board.GetLength(0); x++)
-        {
-            for (var y = 0; y < board.GetLength(1); y++)
-            {
-                var size = RoomSize(x, y, roomNumber, 0);
-
-                if (size != 0)
-                {
-                    if (size > bigestRoom.Size)
-                    {
-                        bigestRoom.RoomNumber = roomNumber;
-                        bigestRoom.Size = size;
-                    }
-
-                    roomNumber++;
-                }
-            }
-        }
-
-        return bigestRoom;
-    }
-
     private void ConnectRooms()
     {
-        for (int x = 0; x < _boardWidth; x++)
+        for (int x = 0; x < boardWidth; x++)
         {
-            for (int y = 0; y < _boardHeight; y++)
+            for (int y = 0; y < boardHeight; y++)
             {
-                if (x < _borderSize
-                    || x > _boardWidth - _borderSize
-                    || y < _borderSize
-                    || y > _boardHeight - _borderSize)
+                if (x < borderSize
+                    || x > boardWidth - borderSize
+                    || y < borderSize
+                    || y > boardHeight - borderSize)
                 {
                     continue;
                 }
@@ -114,14 +82,14 @@ public abstract class BoardGeneratorStrategy : MonoBehaviour
     {
         RemoveRooms();
 
-        for (int x = 0; x < _boardWidth; x++)
+        for (int x = 0; x < boardWidth; x++)
         {
-            for (int y = 0; y < _boardHeight; y++)
+            for (int y = 0; y < boardHeight; y++)
             {
-                if (x < _borderSize
-                    || x > _boardWidth - _borderSize
-                    || y < _borderSize
-                    || y > _boardHeight - _borderSize)
+                if (x < borderSize
+                    || x > boardWidth - borderSize
+                    || y < borderSize
+                    || y > boardHeight - borderSize)
                 {
                     continue;
                 }
@@ -137,9 +105,9 @@ public abstract class BoardGeneratorStrategy : MonoBehaviour
 
     private void RemoveRooms()
     {
-        for (int x = 0; x < _boardWidth; x++)
+        for (int x = 0; x < boardWidth; x++)
         {
-            for (int y = 0; y < _boardHeight; y++)
+            for (int y = 0; y < boardHeight; y++)
             {
                 if (board[x, y] != BoardField.Wall)
                 {
@@ -151,9 +119,9 @@ public abstract class BoardGeneratorStrategy : MonoBehaviour
 
     private void ClearOtherRooms(int roomNumber)
     {
-        for (int x = 0; x < _boardWidth; x++)
+        for (int x = 0; x < boardWidth; x++)
         {
-            for (int y = 0; y < _boardHeight; y++)
+            for (int y = 0; y < boardHeight; y++)
             {
                 if (board[x, y] == (BoardField)roomNumber)
                 {
@@ -169,9 +137,9 @@ public abstract class BoardGeneratorStrategy : MonoBehaviour
 
     private void RemoveClutter()
     {
-        for (int x = 0; x < _boardWidth; x++)
+        for (int x = 0; x < boardWidth; x++)
         {
-            for (int y = 0; y < _boardHeight; y++)
+            for (int y = 0; y < boardHeight; y++)
             {
                 if (board[x, y] == BoardField.FullWall
                     && Random.Range(0, 2) == 1)
