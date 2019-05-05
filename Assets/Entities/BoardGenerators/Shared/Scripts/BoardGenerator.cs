@@ -183,13 +183,9 @@ public class BoardGenerator : MonoBehaviour
     public void SetupScene()
     {
         GenerateBoard();
-
         FindWalls();
-
         FindInnerOuterFloors();
-
         FindObstacles();
-
         DrawBoard();
     }
 }

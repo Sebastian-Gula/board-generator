@@ -1,59 +1,129 @@
-﻿public class DungeonGenerator : BoardGeneratorStrategy
+﻿using System.Linq;
+
+public class DungeonGenerator : BoardGeneratorStrategy
 {
-    public Size RoomXSize;
-    public Size RoomYSize;
-    public Size DistanceFromBorder;
-    public Size SpaceX;
-    public Size SpaceY;
+    public Range RoomXSize;
+    public Range RoomYSize;
+    public Range DistanceFromBorder;
+    public Range SpaceX;
+    public Range SpaceY;
 
-    public override BoardField[,] GenerateBoard(int width, int height, int borderSize)
+    private int _sum;
+    private int _columns;
+    private int _previousRowAverageY;
+
+    public override BoardField[,] GenerateBoard(int width, int height, int borderSize, int minimumAvailableSurfacePercent, int maximumAvailableSurfacePercent)
     {
-        ClearBoard(width, height);
+        _sum = 0;
+        _columns = 0;
+        _previousRowAverageY = DistanceFromBorder.Max;
 
-        var column = 0;
-        var row = 0;
-        var sumY = 0;
-        var translationX = borderSize;
-        var translationY = borderSize;
+        Initialize(width, height, borderSize, minimumAvailableSurfacePercent, maximumAvailableSurfacePercent);
+        ClearBoard(width, height);
+        GenerateRooms(width, height, borderSize);
+
+        return board;
+    }
+
+    private void GenerateRooms(int width, int height, int borderSize)
+    {
+        var translationX = borderSize + DistanceFromBorder.GetRandomRange();
 
         while (true)
         {
-            var roomXSize = RoomXSize.GetRandomSize();
-            var roomYSize = RoomYSize.GetRandomSize();
-            var beginningOfX = translationX + DistanceFromBorder.GetRandomSize();
-            var endOfX = beginningOfX + roomXSize;
-            var beginningOfY = translationY + DistanceFromBorder.GetRandomSize();
-            var endOfY = beginningOfY + roomYSize;
+            var startX = translationX;
+            var endX = startX + RoomXSize.GetRandomRange();
 
-            sumY += roomYSize;
+            if (endX > width - borderSize - DistanceFromBorder.GetRandomRange())
+            {
+                translationX = borderSize + DistanceFromBorder.GetRandomRange();
+                _sum = 0;
+                _columns = 0;
+                _previousRowAverageY = GetCurrentAverageHeight() + RoomYSize.Max + SpaceY.Max;
+                continue;
+            }
 
-            if (endOfY > height - borderSize - DistanceFromBorder.GetRandomSize())
+            var startY = GetLowerRoom(startX, endX - startX) + SpaceY.GetRandomRange();
+            var endY = startY + RoomYSize.GetRandomRange();
+
+            if (endY > height - borderSize - DistanceFromBorder.GetRandomRange())
             {
                 break;
             }
 
-            if (endOfX > width - borderSize - DistanceFromBorder.GetRandomSize())
-            {
-                translationX = borderSize;
-                translationY += (sumY / column) + SpaceY.GetRandomSize();
-                sumY = 0;
-                column = 0;
-                row++;
-                continue;
-            }
+            var averageY = GetCurrentAverageHeight();
 
-            for (var x = beginningOfX; x < endOfX; x++)
+            if (startY - averageY <= RoomYSize.Max + SpaceY.Max)
             {
-                for (var y = beginningOfY; y < endOfY; y++)
+                for (var x = startX; x < endX; x++)
                 {
-                    board[x, y] = BoardField.Empty;
+                    for (var y = startY; y < endY; y++)
+                    {
+                        board[x, y] = BoardField.Empty;
+                    }
                 }
+
+                UpdateCurrentAverageHeight(startY);
             }
 
-            translationX = endOfX + SpaceX.GetRandomSize();
-            column++;
+            translationX = endX + SpaceX.GetRandomRange();
+        }
+    }
+
+    private int GetLowerRoom(int startX, int endX)
+    {
+        var numbers = Enumerable.Range(startX, endX).ToList();
+        var maxY = borderSize + DistanceFromBorder.GetRandomRange() - SpaceY.GetRandomRange();
+
+        foreach (var x in numbers)
+        {
+            if (TryGetLowerRoom(x, out int y) && y > maxY)
+            {
+                maxY = y;
+            }
         }
 
-        return board;
+        return maxY;
+    }
+
+    private bool TryGetLowerRoom(int x, out int y)
+    {
+        var i = 1;
+        var startY = boardHeight - borderSize;
+
+        while (true)
+        {
+            y = startY - i;
+
+            if (y < borderSize + DistanceFromBorder.GetRandomRange())
+            {
+                return false;
+            }
+
+            var field = board[x, y];
+
+            if (field == BoardField.Empty)
+            {
+                return true;
+            }
+
+            i++;
+        }
+    }
+
+    private int GetCurrentAverageHeight()
+    {
+        if (_columns == 0)
+        {
+            return _previousRowAverageY;
+        }
+
+        return _sum / _columns;
+    }
+
+    private void UpdateCurrentAverageHeight(int y)
+    {
+        _columns++;
+        _sum += y;
     }
 }

@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1093825235400568}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 119.31391, y: 57.23339, z: -1.875}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -45,16 +45,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RoomXSize:
     Min: 1
-    Max: 6
+    Max: 3
   RoomYSize:
     Min: 1
-    Max: 6
-  StartSize:
+    Max: 3
+  DistanceFromBorder:
     Min: 0
-    Max: 10
+    Max: 7
   SpaceX:
-    Min: 2
-    Max: 9
+    Min: 0
+    Max: 3
   SpaceY:
-    Min: -2
-    Max: 6
+    Min: 0
+    Max: 3
