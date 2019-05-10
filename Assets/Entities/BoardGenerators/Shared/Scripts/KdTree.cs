@@ -3,12 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
+public class KdTree : IEnumerable<Vector2>
 {
     protected KdNode _root;
     protected KdNode _last;
     protected int _count;
-    protected bool _just2D;
     protected float _LastUpdate = -1f;
     protected KdNode[] _open;
 
@@ -17,16 +16,8 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     public float AverageSearchLength { protected set; get; }
     public float AverageSearchDeep { protected set; get; }
 
-    /// <summary>
-    /// create a tree
-    /// </summary>
-    /// <param name="just2D">just use x/z</param>
-    public KdTree(bool just2D = false)
-    {
-        _just2D = just2D;
-    }
 
-    public T this[int key]
+    public Vector2 this[int key]
     {
         get
         {
@@ -43,7 +34,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     /// add item
     /// </summary>
     /// <param name="item">item</param>
-    public void Add(T item)
+    public void Add(Vector2 item)
     {
         _add(new KdNode() { component = item });
     }
@@ -52,7 +43,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     /// batch add items
     /// </summary>
     /// <param name="items">items</param>
-    public void AddAll(List<T> items)
+    public void AddAll(List<Vector2> items)
     {
         foreach (var item in items)
             Add(item);
@@ -62,9 +53,9 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     /// find all objects that matches the given predicate
     /// </summary>
     /// <param name="match">lamda expression</param>
-    public KdTree<T> FindAll(Predicate<T> match)
+    public KdTree FindAll(Predicate<Vector2> match)
     {
-        var list = new KdTree<T>(_just2D);
+        var list = new KdTree();
         foreach (var node in this)
             if (match(node))
                 list.Add(node);
@@ -75,7 +66,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     /// find first object that matches the given predicate
     /// </summary>
     /// <param name="match">lamda expression</param>
-    public T Find(Predicate<T> match)
+    public Vector2 Find(Predicate<Vector2> match)
     {
         var current = _root;
         while (current != null)
@@ -84,7 +75,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
                 return current.component;
             current = current.next;
         }
-        return null;
+        return default;
     }
 
     /// <summary>
@@ -108,7 +99,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     /// remove all objects that matches the given predicate
     /// </summary>
     /// <param name="match">lamda expression</param>
-    public void RemoveAll(Predicate<T> match)
+    public void RemoveAll(Predicate<Vector2> match)
     {
         var list = new List<KdNode>(_getNodes());
         list.RemoveAll(n => match(n.component));
@@ -127,7 +118,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     /// </summary>
     /// <param name="match">lamda expression</param>
     /// <returns>matching object count</returns>
-    public int CountAll(Predicate<T> match)
+    public int CountAll(Predicate<Vector2> match)
     {
         int count = 0;
         foreach (var node in this)
@@ -194,7 +185,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     /// Method to enable foreach-loops
     /// </summary>
     /// <returns>Enumberator</returns>
-    public IEnumerator<T> GetEnumerator()
+    public IEnumerator<Vector2> GetEnumerator()
     {
         var current = _root;
         while (current != null)
@@ -208,9 +199,9 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     /// Convert to list
     /// </summary>
     /// <returns>list</returns>
-    public List<T> ToList()
+    public List<Vector2> ToList()
     {
-        var list = new List<T>();
+        var list = new List<Vector2>();
         foreach (var node in this)
             list.Add(node);
         return list;
@@ -224,19 +215,13 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
         return GetEnumerator();
     }
 
-    protected float _distance(Vector3 a, Vector3 b)
+    protected float _distance(Vector2 a, Vector2 b)
     {
-        if (_just2D)
-            return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z);
-        else
-            return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z);
+        return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
     }
-    protected float _getSplitValue(int level, Vector3 position)
+    protected float _getSplitValue(int level, Vector2 position)
     {
-        if (_just2D)
-            return (level % 2 == 0) ? position.x : position.z;
-        else
-            return (level % 3 == 0) ? position.x : (level % 3 == 1) ? position.y : position.z;
+        return (level % 2 == 0) ? position.x : position.y;
     }
 
     private void _add(KdNode newNode)
@@ -245,7 +230,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
         newNode.left = null;
         newNode.right = null;
         newNode.level = 0;
-        var parent = _findParent(newNode.component.transform.position);
+        var parent = _findParent(newNode.component);
 
         //set last
         if (_last != null)
@@ -260,7 +245,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
         }
 
         var splitParent = _getSplitValue(parent);
-        var splitNew = _getSplitValue(parent.level, newNode.component.transform.position);
+        var splitNew = _getSplitValue(parent.level, newNode.component);
         
         newNode.level = parent.level + 1;
 
@@ -270,7 +255,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
             parent.right = newNode; //go right
     }
 
-    private KdNode _findParent(Vector3 position)
+    private KdNode _findParent(Vector2 position)
     {
         //travers from root to bottom and check every node
         var current = _root;
@@ -295,7 +280,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     /// </summary>
     /// <param name="position">position</param>
     /// <returns>closest object</returns>
-    public T FindClosest(Vector3 position)
+    public Vector2 FindClosest(Vector3 position)
     {
         return _findClosest(position);
     }
@@ -305,17 +290,17 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
     /// </summary>
     /// <param name="position">position</param>
     /// <returns>close object</returns>
-    public IEnumerable<T> FindClose(Vector3 position)
+    public IEnumerable<Vector2> FindClose(Vector3 position)
     {
-        var output = new List<T>();
+        var output = new List<Vector2>();
         _findClosest(position, output);
         return output;
     }
 
-    protected T _findClosest(Vector3 position, List<T> traversed = null)
+    protected Vector2 _findClosest(Vector3 position, List<Vector2> traversed = null)
     {
         if (_root == null)
-            return null;
+            return default;
 
         var nearestDist = float.MaxValue;
         KdNode nearest = null;
@@ -337,7 +322,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
             if (traversed != null)
                 traversed.Add(current.component);
 
-            var nodeDist = _distance(position, current.component.transform.position);
+            var nodeDist = _distance(position, current.component);
             if (nodeDist < nearestDist)
             {
                 nearestDist = nodeDist;
@@ -371,7 +356,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
 
     private float _getSplitValue(KdNode node)
     {
-        return _getSplitValue(node.level, node.component.transform.position);
+        return _getSplitValue(node.level, node.component);
     }
 
     private IEnumerable<KdNode> _getNodes()
@@ -386,7 +371,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
 
     protected class KdNode
     {
-        internal T component;
+        internal Vector2 component;
         internal int level;
         internal KdNode left;
         internal KdNode right;
