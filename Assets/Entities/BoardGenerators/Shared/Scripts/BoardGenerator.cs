@@ -19,11 +19,9 @@ public class BoardGenerator : MonoBehaviour
     public int BoardHeight;
     public int BorderSize;
 
-    [Range(10, 30)]
+    [Range(5, 50)]
     public int MinimumAvailableSurfacePercent;
 
-    [Range(35, 60)]
-    public int MaximumAvailableSurfacePercent;
 
     private void Awake()
     {
@@ -89,7 +87,7 @@ public class BoardGenerator : MonoBehaviour
     private void GenerateBoard()
     {
         Board.BoardFields
-            = BoardGeneratorStrategy.GenerateBoard(BoardWidth, BoardHeight, BorderSize, MinimumAvailableSurfacePercent, MaximumAvailableSurfacePercent);
+            = BoardGeneratorStrategy.GenerateBoard(BoardWidth, BoardHeight, BorderSize, MinimumAvailableSurfacePercent);
     }
 
     private void FindWalls()
