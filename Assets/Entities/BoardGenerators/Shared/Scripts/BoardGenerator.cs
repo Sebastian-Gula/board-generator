@@ -6,8 +6,6 @@ using Random = UnityEngine.Random;
 
 public class BoardGenerator : MonoBehaviour
 {
-    private int _minimumFloorTiles;
-    private int _maximumFloorTiles;
     private DictionaryInfoHelper _dictionaryInfoHelper;
     private List<Vector2> _outerFloorTilesPostitions;
     private List<Vector2> _innerFloorTilesPostitions;
@@ -21,11 +19,8 @@ public class BoardGenerator : MonoBehaviour
     public int BoardHeight;
     public int BorderSize;
 
-    [Range(10, 30)]
+    [Range(5, 50)]
     public int MinimumAvailableSurfacePercent;
-
-    [Range(35, 60)]
-    public int MaximumAvailableSurfacePercent;
 
 
     private void Awake()
@@ -37,8 +32,6 @@ public class BoardGenerator : MonoBehaviour
 
     private void Initialize()
     {
-        var usableSpace = (BoardHeight - 2 * BorderSize) * (BoardWidth - 2 * BorderSize);
-
         Board = new BoardInfo()
         {
             BoardFields = new BoardField[BoardWidth, BoardHeight],
@@ -48,8 +41,7 @@ public class BoardGenerator : MonoBehaviour
         _dictionaryInfoHelper = new DictionaryInfoHelper();
         _outerFloorTilesPostitions = new List<Vector2>();
         _innerFloorTilesPostitions = new List<Vector2>();
-        _minimumFloorTiles = usableSpace * MinimumAvailableSurfacePercent / 100;
-        _maximumFloorTiles = usableSpace * MaximumAvailableSurfacePercent / 100;
+
         _filedsByType = new Dictionary<BoardField, List<GameObject>>();
         _fieldTypeByNeigbors = new Dictionary<string, BoardField>
         {
@@ -94,160 +86,8 @@ public class BoardGenerator : MonoBehaviour
 
     private void GenerateBoard()
     {
-        Board.BoardFields = BoardGeneratorStrategy.GenerateBoard(BoardWidth, BoardHeight, BorderSize);
-    }
-
-    private void ImproveBoard()
-    {
-        Room bigestRoom = FindBiggestRoom();
-
-        if (bigestRoom.Size < _minimumFloorTiles)
-        {
-            ConnectRooms();
-            return;
-        }
-
-        if (bigestRoom.Size > _maximumFloorTiles)
-        {
-            DisconnectRooms();
-            return;
-        }
-
-        ClearOtherRooms(bigestRoom.RoomNumber);
-        FindWalls();
-        RemoveClutter();
-    }
-
-    private Room FindBiggestRoom()
-    {
-        int roomNumber = 3;
-        var bigestRoom = new Room
-        {
-            RoomNumber = 0,
-            Size = 0
-        };
-
-        for (var x = 0; x < BoardWidth; x++)
-        {
-            for (var y = 0; y < BoardHeight; y++)
-            {
-                var size = RoomSize(x, y, roomNumber, 0);
-
-                if (size != 0)
-                {
-                    if (size > bigestRoom.Size)
-                    {
-                        bigestRoom.RoomNumber = roomNumber;
-                        bigestRoom.Size = size;
-                    }
-
-                    roomNumber++;
-                }
-            }
-        }
-
-        return bigestRoom;
-    }
-
-    private void ConnectRooms()
-    {
-        for (int x = 0; x < BoardWidth; x++)
-        {
-            for (int y = 0; y < BoardHeight; y++)
-            {
-                if (x < BorderSize
-                    || x > BoardWidth - BorderSize
-                    || y < BorderSize
-                    || y > BoardHeight - BorderSize)
-                {
-                    continue;
-                }
-
-                if (Board.BoardFields[x, y] == BoardField.Wall
-                    && Random.Range(0, 25) == 1)
-                {
-                    Board.BoardFields[x, y] = BoardField.Empty;
-                }
-            }
-        }
-
-        RemoveRooms();
-        ImproveBoard();
-    }
-
-    private void DisconnectRooms()
-    {
-        RemoveRooms();
-
-        for (int x = 0; x < BoardWidth; x++)
-        {
-            for (int y = 0; y < BoardHeight; y++)
-            {
-                if (x < BorderSize
-                    || x > BoardWidth - BorderSize
-                    || y < BorderSize
-                    || y > BoardHeight - BorderSize)
-                {
-                    continue;
-                }
-
-                if (Board.BoardFields[x, y] == BoardField.Empty
-                    && Random.Range(0, 30) == 1)
-                {
-                    Board.BoardFields[x, y] = BoardField.Wall;
-                }
-            }
-        }
-
-        ImproveBoard();
-    }
-
-    private void RemoveRooms()
-    {
-        for (int x = 0; x < BoardWidth; x++)
-        {
-            for (int y = 0; y < BoardHeight; y++)
-            {
-                if (Board.BoardFields[x, y] != BoardField.Wall)
-                {
-                    Board.BoardFields[x, y] = BoardField.Empty;
-                }
-            }
-        }
-    }
-
-    private int RoomSize(int x, int y, int roomNumber, int size)
-    {
-        if (Board.BoardFields[x, y] == BoardField.Empty)
-        {
-            size++;
-            Board.BoardFields[x, y] = (BoardField)roomNumber;
-
-            size = RoomSize(x - 1, y, roomNumber, size);
-            size = RoomSize(x, y + 1, roomNumber, size);
-            size = RoomSize(x + 1, y, roomNumber, size);
-            size = RoomSize(x, y - 1, roomNumber, size);
-        }
-
-        return size;
-    }
-
-    private void ClearOtherRooms(int roomNumber)
-    {
-        for (int x = 0; x < BoardWidth; x++)
-        {
-            for (int y = 0; y < BoardHeight; y++)
-            {
-                if (Board.BoardFields[x, y] == (BoardField)roomNumber)
-                {
-                    Board.BoardFields[x, y] = BoardField.Floor;
-                }
-                else
-                {
-                    Board.BoardFields[x, y] = BoardField.Wall;
-                }
-            }
-        }
+        Board.BoardFields
+            = BoardGeneratorStrategy.GenerateBoard(BoardWidth, BoardHeight, BorderSize, MinimumAvailableSurfacePercent);
     }
 
     private void FindWalls()
@@ -269,21 +109,6 @@ public class BoardGenerator : MonoBehaviour
                 if (_fieldTypeByNeigbors.TryGetValue(key, out BoardField type))
                 {
                     Board.BoardFields[x, y] = type;
-                }
-            }
-        }
-    }
-
-    private void RemoveClutter()
-    {
-        for (int x = 0; x < BoardWidth; x++)
-        {
-            for (int y = 0; y < BoardHeight; y++)
-            {
-                if (Board.BoardFields[x, y] == BoardField.FullWall
-                    && Random.Range(0, 2) == 1)
-                {
-                    Board.BoardFields[x, y] = BoardField.Floor;
                 }
             }
         }
@@ -353,17 +178,12 @@ public class BoardGenerator : MonoBehaviour
         }
     }
 
-
     public void SetupScene()
     {
         GenerateBoard();
-
-        ImproveBoard();
-
+        FindWalls();
         FindInnerOuterFloors();
-
         FindObstacles();
-
         DrawBoard();
     }
 }

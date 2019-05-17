@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class Size
+public class Range
 {
     public int Min;
     public int Max;
 
-    public int GetRandomSize()
+    public int GetRandomRange()
     {
-        return Random.Range(Min, Max);
+        return Random.Range(Min, Max + 1);
     }
 }
