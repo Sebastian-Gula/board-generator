@@ -45,10 +45,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RoomXSize:
     Min: 1
-    Max: 3
+    Max: 5
   RoomYSize:
     Min: 1
-    Max: 3
+    Max: 5
   DistanceFromBorder:
     Min: 0
     Max: 7
